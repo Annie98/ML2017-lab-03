@@ -42,19 +42,22 @@ def acc_plot(validation_score_list):
     plt.xlabel('Iteration')
     plt.ylabel('Accuracy')
     plt.plot(range(len(validation_score_list)),validation_score_list)  
-    plt.grid()
+    #plt.grid()
     plt.show()
         
 if __name__ == "__main__":
-    # write your code here    
-    #pre_image()
+      
+    pre_image()
     with open('features', "rb") as f:
         x = pickle.load(f) 
     with open('labels',"rb") as f: 
         y = pickle.load(f)
     X_train,X_test,y_train,y_test = train_test_split(x,y,test_size=0.33,random_state=0)
     maxIteration = 10
-    predict_y = AdaBoostClassifier(DecisionTreeClassifier(max_depth=3),maxIteration).fit(X_train, y_train).predict(X_test)
+    s,validation_score_list = AdaBoostClassifier(DecisionTreeClassifier(max_depth=3),maxIteration).fit(X_train, y_train)
+    predict_y = s.predict(X_test)
+    
+    acc_plot(validation_score_list)
     
     with open('report.txt', "wb") as f:
         report = classification_report(y_test,predict_y,target_names=["face","nonface"])
