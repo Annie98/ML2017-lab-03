@@ -9,7 +9,7 @@ class AdaBoostClassifier:
         self.G = [] #弱分类器的集合
         self.num = -1 #弱分类器的数量
         self.alpha = []
-        #self.validation_score_list = []
+        self.validation_score_list = []
 
     def fit(self,X,y): 
         self.W = np.ones(X.shape[0] )/X.shape[0] #初始化样本权值分布
@@ -20,6 +20,7 @@ class AdaBoostClassifier:
             P = clf.predict(X)  #采用弱分类器得到的分类结果
             error = np.sum((P != y.reshape(-1,)) * self.W)#分类误差率 
             #error = 1.0 - self.G[i].score(self.X,self.y) 
+            self.validation_score_list.append(1.0-error)
             if error > 0.5:
                 continue
             elif error == 0:
@@ -28,7 +29,7 @@ class AdaBoostClassifier:
             self.alpha.append(e)
             Z = np.multiply(self.W,np.exp(-self.alpha[i]* np.multiply(y.reshape(-1,) , P))) #规范化因子
             self.W = Z/np.sum(Z)
-        return self
+        return self,self.validation_score_list
    
     def predict_scores(self, X):
         Score = np.zeros(X.shape[0])
